@@ -8,10 +8,11 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - MONGO_URI=mongodb://host.docker.internal:27017/orders
+      - MONGO_URI=mongodb://root:secret@mongo:27017/ordersdb?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
     depends_on:
       - rabbitmq
+      - mongo
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -19,3 +20,15 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: ordersdb
+    volumes:
+      - ./data/mongo:/data/db
