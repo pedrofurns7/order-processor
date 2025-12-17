@@ -5,7 +5,7 @@ import Order from '../models/order.model.js';
 
 await connectDB();
 
-export const consumeMessages = async(queue: string) =>{
+export const startConsumer = async(queue: string) =>{
     const connection = await amqp.connect('amqp://localhost')
     const channel = await connection.createChannel()
     
@@ -14,7 +14,7 @@ export const consumeMessages = async(queue: string) =>{
 
     console.log(`Waiting for messages in ${queue}...`);
 
-    channel.consume(queue, (msg)=>{
+    channel.consume(queue, (msg)=> {
         if(!msg) return;
             
         try{

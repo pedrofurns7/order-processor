@@ -12,7 +12,7 @@ router.post('/order', async (req, res) =>{
             return res.status(400).send({error: 'Invalid order data'});
         }
 
-        await publishOrder(order);
+        await publishOrder('order_created', order);
         
         res.status(201).json({message:"Order received", order});    
     } catch(error){

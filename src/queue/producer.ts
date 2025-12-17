@@ -2,27 +2,17 @@ import amqp from 'amqplib';
 
 import {IOrder} from "../models/order.model.js";
 
-export const publishOrder = async(orderData: IOrder) =>{
+export const publishOrder = async(routingKey: string, orderData: IOrder) =>{
     const connection = await amqp.connect('amqp://localhost')
     const channel = await connection.createChannel();
     
-    const orderQueue = "order";
-    const emailQueue = "email";
+    const exchange = 'orders_exchange';
     
-    await channel.assertQueue(orderQueue, {durable: true});
-    await channel.assertQueue(emailQueue, {durable: true});
+    await channel.assertExchange(exchange, 'direct', {durable: true});
 
+    channel.publish(exchange,routingKey, Buffer.from(JSON.stringify(orderData)));
 
-    channel.sendToQueue(orderQueue, Buffer.from(JSON.stringify(orderData)), {
-        persistent: true
-    });
-    console.log("📦 Pedido enviado para fila orderQueue");
-
-    channel.sendToQueue(emailQueue, Buffer.from(JSON.stringify({email: orderData.customerEmail})), {
-        persistent: true
-    });
-    console.log("📨 E-mail enviado para fila emailQueue");
-
+    console.log(`📦 Pedido enviado para a ${exchange}`);
 
     await channel.close();
     await connection.close();

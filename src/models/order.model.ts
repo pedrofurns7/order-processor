@@ -4,6 +4,7 @@ interface IItem {
   name: string;
   price: number;
 }
+
 export interface IOrder extends Document{
     customerId: string;
     customerEmail: string; 

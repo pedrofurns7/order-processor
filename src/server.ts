@@ -1,12 +1,9 @@
 import express from 'express'
 
-
 import { connectDB } from "./config/database.js";
 
-import { consumeMessages } from './queue/consumer.js'
-import { startEmailConsumer } from './queue/emailConsumer.js';
 import orderRoutes from './routes/order.routes.js'
-import { start } from 'repl';
+import { startConsumer } from './queue/newConsumer.js';
 
 const app = express()
 app.use(express.json())
@@ -17,14 +14,12 @@ async function startServer(){
   try{
     await connectDB();
     console.log("Connected to MongoDB");
-
-    consumeMessages('order');
-    startEmailConsumer('email');
-
-    
+   
     app.listen(3000, () => {
       console.log('Server is running on port 3000')
     });
+
+    await startConsumer().then(() => console.log("Consumer started ✅"));
   }catch(error){
     console.error("❌ Failed to start server:", error);
   }
